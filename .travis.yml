@@ -8,3 +8,6 @@ rvm:
   - rbx-18mode
   - rbx-19mode # currently in active development, may or may not work for your project
 before_install: gem install bones nokogiri sinatra webrick; (ruby test/server/server.rb &); (ruby test/server/server.rb --use-ssl --port 4568 &); sleep 5
+notifications:
+  recipients:
+    - liebler.dominik@googlemail.com
