@@ -2,6 +2,8 @@
 
 Messie is a simple web crawler that crawls one page at a time.
 
+[![Build Status](https://travis-ci.org/domnikl/messie.png?branch=release/0.5.0)](https://travis-ci.org/domnikl/messie) [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/domnikl/messie)
+
 ## Features
 
 * follows HTTP redirects (max 5 levels deep)
