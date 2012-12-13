@@ -1,10 +1,8 @@
 require 'rubygems'
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
 
-begin
-  require 'bones'
-rescue LoadError
-  abort '### Please install the "bones" gem ###'
-end
+require 'messie'
 
 task :default => 'test:run'
 task 'gem:release' => 'test:run'
@@ -27,14 +25,19 @@ namespace :test do
   end
 end
 
-Bones {
-  name     'messie'
-  authors  'Dominik Liebler'
-  email    'liebler.dominik@googlemail.com'
-  url      'https://domnikl.github.com/messie'
-  ignore_file  '.gitignore'
-  depend_on 'nokogiri'
-  depend_on 'webrick', :development => true
-  depend_on 'sinatra', :development => true
-  depend_on 'simplecov', :development => true
-}
+gem_name = "messie-#{Messie::VERSION}.gem"
+
+namespace :gem do
+    task :build do
+      system "gem build messie.gemspec"
+    end
+
+    task :install => :build do
+      system "gem install #{gem_name}"
+    end
+
+    task :release => :build do
+      system "gem push #{gem_name}"
+    end
+end
+
