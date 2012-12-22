@@ -1,11 +1,11 @@
 require 'rubygems'
+require 'rake/testtask'
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
 require 'messie'
 
-task :default => 'test:run'
-task 'gem:release' => 'test:run'
+task :default => 'test'
 
 namespace :test do
   namespace :server do
@@ -28,16 +28,27 @@ end
 gem_name = "messie-#{Messie::VERSION}.gem"
 
 namespace :gem do
-    task :build do
-      system "gem build messie.gemspec"
-    end
+  task :clean do
+    system "rm -f *.gem"
+  end
+  
+  task :build do
+    system "gem build messie.gemspec"
+  end
 
-    task :install => :build do
-      system "gem install #{gem_name}"
-    end
+  task :install => :build do
+    system "gem install #{gem_name}"
+  end
 
-    task :release => :build do
-      system "gem push #{gem_name}"
-    end
+  task :release => :build do
+    system "gem push #{gem_name}"
+  end
+end
+
+Rake::TestTask.new do |t|
+  t.libs = ["lib"]
+  t.warning = true
+  t.verbose = true
+  t.test_files = FileList['test/**/test_*.rb']
 end
 
