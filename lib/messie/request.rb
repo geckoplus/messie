@@ -38,7 +38,7 @@ module Messie
       @response_time = 0
       @ssl_verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-      request ||= build_request(@uri)
+      request ||= build_client(@uri)
       @request = request
     end
 
@@ -109,13 +109,31 @@ module Messie
 
     private
 
+    # initializes the request
+    #
+    # previous request a Net::HTTP if there was a redirect
+    #
+    # Returns a (new) Net::HTTP object
+    def init_client(previous_client = nil)
+      client = previous_client
+      client ||= @request
+
+      if @uri.scheme == 'https'
+        client.use_ssl = true
+        client.verify_mode = @ssl_verify_mode
+        client.cert_store = @ssl_cert_store
+      end
+      
+      client
+    end
+
     # Internal: crawls the page and follows HTTP redirects (if any)
     #
-    # request - a Net::HTTP object to be used to do the request
+    # previous_client - a Net::HTTP object to be used to do the request
     # limit - a Fixnum counting the max HTTP redirects
     #
     # Returns: a Messie::Response object
-    def crawl_and_follow(request = nil, limit = 5)
+    def crawl_and_follow(previous_client = nil, limit = 5)
       fail 'HTTP redirect too deep' if limit.zero?
 
       get_request = Net::HTTP::Get.new(request_path)
@@ -125,17 +143,10 @@ module Messie
         get_request[key] = value
       end
 
-      request ||= @request
-
-      if @uri.scheme == 'https'
-        request.use_ssl = true
-        request.verify_mode = @ssl_verify_mode
-        request.cert_store = @ssl_cert_store
-      end
+      client = init_client(previous_client)
 
       start = Time.new
-      response = request.request(get_request)
-
+      response = client.request(get_request)
       @response_time += Time.new - start
 
       case response
@@ -148,12 +159,11 @@ module Messie
 
         # sets a new individual Net::HTTP object to be used as the requester
         if @uri.host != new_uri.host or @uri.port != new_uri.port
-          request = build_request(new_uri)
+          request = build_client(new_uri)
         end
 
         @uri = new_uri
-	
-        crawl_and_follow(request, limit - 1)
+        crawl_and_follow(client, limit - 1)
       else
         response.error!
       end
@@ -172,7 +182,7 @@ module Messie
     # uri - a String or URI object
     #
     # Returns: a Net::HTTP object
-    def build_request(uri)
+    def build_client(uri)
       uri = URI.parse(uri) unless uri.kind_of? URI
       Net::HTTP.new(uri.host, uri.port)
     end
