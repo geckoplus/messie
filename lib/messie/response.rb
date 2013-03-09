@@ -13,6 +13,7 @@ module Messie
     attr_reader :code, :body, :time, :headers, :uri
 
     # Public: creates Messie::Response objects from a net/http response
+    #         only use this method to create instances of the response instead of .new!
     #
     # uri             - a String or URI object
     # response        - a Net::HTTPResponse response object
@@ -39,18 +40,6 @@ module Messie
       })
     end
 
-    # Internal: inits a new Messie::Response object
-    #           should not used, better use Messie::Response.create() instead!
-    #
-    def initialize(data = {})
-      @uri = data[:uri]
-      @code = data[:code]
-      @time = data[:time]
-      @body = data[:body]
-      @headers = data[:response_headers]
-      @request_headers = data[:request_headers]
-    end
-
     # Public: serializes the Messie::Response to a Hash
     #
     # Returns: a Hash containing the following keys:
@@ -72,6 +61,18 @@ module Messie
     end
 
     private
+
+    # Internal: inits a new Messie::Response object
+    #           should not be used, better use Messie::Response.create() instead!
+    #
+    def initialize(data = {})
+      @uri = data[:uri]
+      @code = data[:code]
+      @time = data[:time]
+      @body = data[:body]
+      @headers = data[:response_headers]
+      @request_headers = data[:request_headers]
+    end
 
     # Internal: decodes the content of the page with the given algorithm
     #

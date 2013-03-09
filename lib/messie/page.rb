@@ -32,6 +32,7 @@ module Messie
     def self.crawl(uri, &block)
       request = Messie::Request.new(uri)
 
+      # set options for the request with block syntax
       if block_given?
         request.instance_eval(&block)
       end
@@ -52,8 +53,7 @@ module Messie
       page = request.crawl.to_h
       page[:uri] ||= uri
 
-      obj = self.new(page)
-      obj
+      self.new(page)
     end
 
     attr_reader :uri, :response_time, :request_headers

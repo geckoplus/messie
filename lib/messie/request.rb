@@ -34,12 +34,10 @@ module Messie
       }
 
       self.uri = uri
+      @request = request
       @response = nil
       @response_time = 0
       @ssl_verify_mode = OpenSSL::SSL::VERIFY_PEER
-
-      request ||= build_request(@uri)
-      @request = request
     end
 
     # Public: sets the URI to be requested
@@ -116,8 +114,9 @@ module Messie
     # Returns a (new) Net::HTTP object
     def init_client(previous_client = nil)
       client = previous_client
-      client ||= @request
+      client ||= build_client(@uri)
 
+      # set SSL options for https:// uris
       if @uri.scheme == 'https'
         client.use_ssl = true
         client.verify_mode = @ssl_verify_mode
@@ -125,6 +124,16 @@ module Messie
       end
       
       client
+    end
+
+    # Internal: creates a new Net::HTTP object
+    #
+    # uri - a String or URI object
+    #
+    # Returns: a Net::HTTP object
+    def build_client(uri)
+      uri = URI.parse(uri) unless uri.kind_of? URI
+      Net::HTTP.new(uri.host, uri.port)
     end
 
     # Internal: inits the GET request and sets all headers into it
@@ -164,7 +173,7 @@ module Messie
 
         # sets a new individual Net::HTTP object to be used as the requester
         if @uri.host != new_uri.host or @uri.port != new_uri.port
-          client = build_request(new_uri)
+          client = build_client(new_uri)
         end
 
         @uri = new_uri
@@ -180,16 +189,6 @@ module Messie
     def request_path
       return '/' if @uri.path.length == 0
       @uri.path
-    end
-
-    # Internal: creates a new Net::HTTP object
-    #
-    # uri - a String or URI object
-    #
-    # Returns: a Net::HTTP object
-    def build_request(uri)
-      uri = URI.parse(uri) unless uri.kind_of? URI
-      Net::HTTP.new(uri.host, uri.port)
     end
   end
 end
