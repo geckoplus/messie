@@ -38,7 +38,7 @@ module Messie
       @response_time = 0
       @ssl_verify_mode = OpenSSL::SSL::VERIFY_PEER
 
-      request ||= build_client(@uri)
+      request ||= build_request(@uri)
       @request = request
     end
 
@@ -127,6 +127,20 @@ module Messie
       client
     end
 
+    # Internal: inits the GET request and sets all headers into it
+    #
+    # Returns: a Net::HTTP::Get object
+    def init_get_request
+      get_request = Net::HTTP::Get.new(request_path)
+
+      # set headers
+      @headers.each do |key, value|
+        get_request[key] = value
+      end
+
+      get_request
+    end
+
     # Internal: crawls the page and follows HTTP redirects (if any)
     #
     # previous_client - a Net::HTTP object to be used to do the request
@@ -136,30 +150,21 @@ module Messie
     def crawl_and_follow(previous_client = nil, limit = 5)
       fail 'HTTP redirect too deep' if limit.zero?
 
-      get_request = Net::HTTP::Get.new(request_path)
-
-      # set headers
-      @headers.each do |key, value|
-        get_request[key] = value
-      end
-
       client = init_client(previous_client)
 
       start = Time.new
-      response = client.request(get_request)
+      response = client.request(init_get_request)
       @response_time += Time.new - start
 
       case response
-      when Net::HTTPSuccess
-        Messie::Response.create(@uri, response, @response_time, @headers)
-      when Net::HTTPNotModified
+      when Net::HTTPSuccess, Net::HTTPNotModified
         Messie::Response.create(@uri, response, @response_time, @headers)
       when Net::HTTPRedirection
         new_uri = URI.parse(response['location'])
 
         # sets a new individual Net::HTTP object to be used as the requester
         if @uri.host != new_uri.host or @uri.port != new_uri.port
-          request = build_client(new_uri)
+          client = build_request(new_uri)
         end
 
         @uri = new_uri
@@ -182,7 +187,7 @@ module Messie
     # uri - a String or URI object
     #
     # Returns: a Net::HTTP object
-    def build_client(uri)
+    def build_request(uri)
       uri = URI.parse(uri) unless uri.kind_of? URI
       Net::HTTP.new(uri.host, uri.port)
     end
