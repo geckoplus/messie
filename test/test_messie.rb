@@ -1,4 +1,12 @@
 $:.unshift(File.join(File.dirname(__FILE__), %w{.. lib}))
+
+begin
+  require 'simplecov'
+  SimpleCov.start
+rescue LoadError
+  # ignore ...
+end
+
 require 'messie'
 require 'test/unit'
 

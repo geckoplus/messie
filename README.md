@@ -2,6 +2,8 @@
 
 Messie is a simple web crawler that crawls one page at a time.
 
+[![Build Status](https://travis-ci.org/domnikl/messie.png?branch=release/0.5.0)](https://travis-ci.org/domnikl/messie) [![Code Climate](https://codeclimate.com/github/domnikl/messie.png)](https://codeclimate.com/github/domnikl/messie)
+
 ## Features
 
 * follows HTTP redirects (max 5 levels deep)
@@ -68,7 +70,7 @@ Original author: Dominik Liebler <liebler.dominik@googlemail.com>
 
 (The MIT License)
 
-Copyright (c) 2012 Dominik Liebler
+Copyright (c) 2013 Dominik Liebler
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
