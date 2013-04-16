@@ -69,7 +69,7 @@ class TestPage < Messie::TestCase
 
   def test_links
     page = Messie::Page.crawl 'http://localhost:4567/links'
-    links = %w{https://rubygems.org/gems/messie https://github.com/domnikl/messie}
+    links = %w{https://rubygems.org/gems/messie https://github.com/domnikl/messie http://localhost:4567/login}
     assert_equal(links, page.links)
   end
 

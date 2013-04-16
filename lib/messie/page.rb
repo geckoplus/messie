@@ -111,9 +111,27 @@ module Messie
     def links
       return [] if body.nil?
 
-      find_links.delete_if do |x|
-        x =~ /^mailto\:/
+      links = find_links.delete_if do |x|
+        x =~ /^(mailto|javascript)\:/ or x =~ /^#/
       end
+
+      # generate absolute urls for all links found
+      links = links.map do |url|
+        url = URI(url)
+
+        # relative URIs are generic URIs
+        if url.class == URI::Generic
+          # set Host, Port and so on ...
+
+          url.host = @uri.host
+          url.scheme = @uri.scheme
+          url.port = @uri.port if @uri.port != 80
+        end
+
+        url.to_s
+      end
+
+      links
     end
 
     # Public: get the <title> of the page

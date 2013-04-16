@@ -61,6 +61,10 @@ class TestServer < Sinatra::Base
             <a href="https://rubygems.org/gems/messie">Messie on Rubygems.org</a>
             <a href="https://github.com/domnikl/messie">Messie on github</a>
             <a href="mailto:foo@bar.com">Email</a>
+            <a href="#">Anchor</a>
+            <a href="#anchor">Anchor 2</a>
+            <a href="javascript:void(0);">JavaScript-link</a>
+            <a href="/login">Login</a>
           </div>
       </body>
     </html>'
