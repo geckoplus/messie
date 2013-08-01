@@ -59,4 +59,10 @@ class TestRequest < Messie::TestCase
     assert_equal 200, page.response_code
     assert_equal 'Foobar', page.body
   end
+
+  def test_with_params
+    page = Messie::Page.crawl 'http://localhost:4567/with-params?foo=bar&baz=foo'
+
+    assert_equal '{"foo"=>"bar", "baz"=>"foo"}', page.body
+  end
 end

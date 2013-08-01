@@ -187,8 +187,14 @@ module Messie
     #
     # Returns: a String describing the request path
     def request_path
-      return '/' if @uri.path.length == 0
-      @uri.path
+      if @uri.path.length == 0
+        uri = '/' 
+      else
+        uri = @uri.path
+      end
+
+      uri = "#{uri}?#{@uri.query}" if @uri.query
+      uri
     end
   end
 end

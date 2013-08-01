@@ -109,6 +109,10 @@ class TestServer < Sinatra::Base
   get '/ssl-test' do
     body "Foobar"
   end
+
+  get '/with-params' do
+    body params.inspect
+  end
 end
 
 puts "starting WEBrick with SSL set to #{options[:use_ssl]} on port #{options[:port]}"
